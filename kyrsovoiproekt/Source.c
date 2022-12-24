@@ -8,7 +8,7 @@
 
 
 struct gonka {
-	char* name[N];
+	char name[N];
 	int time;
 	float distance;
 	int complexity;
@@ -16,22 +16,21 @@ struct gonka {
 };
 typedef struct gonka GONKA;
 
-GONKA add(GONKA* gon, int count);
-void vivod(GONKA* gon, int count);
+GONKA add(GONKA *gon, int count);
+void vivod(GONKA *gon, int count);
 GONKA searchdist(GONKA* gon, int count);
 GONKA searchname(GONKA* gon, int count);
 GONKA sort(GONKA* gon, int count);
 int write(char* namefile, GONKA* gon, int count);
-GONKA read(char* namefile);
+int read(char* namefile, GONKA* gon);
 int main()
 {
 	system("chcp 1251");
 	system("cls");
-	setlocale(LC_ALL, "Rus");
-	int kol=0, flag1 = 1, choice1, choice2, compl,kol1,z;
-	char namefile[100];
 	GONKA* gon;
-	gon = (GONKA*)malloc(50 * sizeof(GONKA));
+	gon = (GONKA*)malloc(N * sizeof(GONKA));
+	int kol, flag1 = 1, choice1, choice2, compl;
+	char namefile[100];
 	printf("***************************************\n");
 	printf("*             База данных             *\n");
 	printf("*Тема: Гонки                          *\n");
@@ -48,9 +47,10 @@ int main()
 		switch (choice1)
 		{
 		case 1:
-			printf("Введите кол-во записей, которое хотите добавить\n");
+			system("cls");
+			printf("Введите кол-во записей\n");
 			scanf("%d", &kol);
-			gon = (GONKA*)realloc(gon, kol * sizeof(GONKA));
+			gon = (GONKA*)malloc(kol * sizeof(GONKA));
 			add(gon, kol);
 			break;
 
@@ -58,6 +58,7 @@ int main()
 		case 2:
 
 			vivod(gon, kol);
+			system("pause");
 			break;
 
 
@@ -80,7 +81,7 @@ int main()
 		case 7:
 			printf("Введите название файла\n");
 			scanf("%s", &namefile);
-			read(namefile, gon);
+			kol=read(namefile, gon);
 			system("pause");
 			break;
 
@@ -104,17 +105,16 @@ GONKA add(GONKA* gon, int count)
 	for (int z = 0; z < count; z++)
 	{
 		printf("Введите название соревнований = ");
-		scanf("%s", gon->name);
+		scanf("%s", &gon[z].name);
 		printf("Продолжительность гонки (в минутах) = ");
-		scanf("%d", &gon->time);
+		scanf("%d", &gon[z].time);
 		printf("Длина трассы(в метрах) = ");
-		scanf("%f", &gon->distance);
+		scanf("%f", &gon[z].distance);
 		printf("Сложность = ");
-		scanf("%d", &gon->complexity);
+		scanf("%d", &gon[z].complexity);
 		printf("Введите среднюю скорость = ");
-		scanf("%d", &gon->avg_speed);
+		scanf("%d", &gon[z].avg_speed);
 		printf("\n");
-		gon++;
 	}
 	return *gon;
 }
@@ -123,59 +123,54 @@ void vivod(GONKA* gon, int count)
 	printf("--------------------------------------------------------------------------------------------------------------------------------------------\n");
 	printf("|| Номер  || Название соревнований  ||  Продолжительность гонки(мин)  ||  Длина трассы(метры)  ||  Сложность  ||  Средняя скорость(км/ч)  ||\n");
 	printf("--------------------------------------------------------------------------------------------------------------------------------------------\n");
-	for (int q = 0; q < count; q++)
+	for (int q = 0; q <count; q++)
 	{
-		printf("||%8d||%24s||%28d Мин||%21f М||%13d||%21d Км/ч||\n", q + 1, gon[q].name, gon[q].time, gon[q].distance, gon[q].complexity, gon[q].avg_speed);
+		printf("||%8d||%24s||%28d Мин||%21f М||%13d||%21d Км/ч||\n", q + 1, gon[q].name, gon[q].time, gon[q].distance,gon[q].complexity, gon[q].avg_speed);
 		printf("--------------------------------------------------------------------------------------------------------------------------------------------\n");
-		gon++;
 	}
-	system("pause");
-	return 0;
 
 }
 GONKA searchname(GONKA* gon, int count)
 {
-	char kr1[10];
-	int choice, kr2, kr3, kr4, kr5, flag2 = 1;
+	char kr[10];
 	printf("Введите название соревнований\n");
-	scanf("%s", kr1);
+	scanf("%s", kr);
 	printf("---------------------------------------------------------------------------------------------------------------------------\n");
 	printf("|| Название соревнований || Продолжительность гонки(мин) || Длина трассы(метры) || Сложность || Средняя скорость(км / ч) || \n");
 	printf("---------------------------------------------------------------------------------------------------------------------------\n");
 	for (int i = 0; i < count; i++)
 	{
-		if (strcmp((gon + i)->name, kr1) == 0)
+		if (strcmp(gon[i].name, kr) == 0)
 		{
-			printf("||%23s||%26d Мин||%19f М||%11d||%21d Км/ч||\n", (gon + count)->name, (gon + count)->time, (gon + count)->distance, (gon + count)->complexity, (gon + count)->avg_speed);
+			printf("||%23s||%26d Мин||%19f М||%11d||%21d Км/ч||\n", gon[i].name, gon[i].time, gon[i].distance, gon[i].complexity, gon[i].avg_speed);
 			printf("---------------------------------------------------------------------------------------------------------------------------\n");
 		}
 
 
 	}
-	gon++;
+
 
 
 	return *gon;
 }
 GONKA searchdist(GONKA* gon, int count)
 {
-	char kr1[10];
-	int choice, kr2, kr3, kr4, kr5, flag2 = 1;
+	int kr;
 	printf("Введите длину трассы\n");
-	scanf("%d", &kr3);
+	scanf("%d", &kr);
 	printf("---------------------------------------------------------------------------------------------------------------------------\n");
 	printf("|| Название соревнований || Продолжительность гонки(мин) || Длина трассы(метры) || Сложность || Средняя скорость(км / ч) || \n");
 	printf("---------------------------------------------------------------------------------------------------------------------------\n");
 		for (int i = 0; i < count; i++)
 		{
-			if ((gon + i)->distance >= kr3)
+			if (gon[i].distance >= kr)
 			{
-				printf("||%23s||%26d Мин||%19f М||%11d||%21d Км/ч||\n", (gon + count)->name, (gon + count)->time, (gon + count)->distance, (gon + count)->complexity, (gon + count)->avg_speed);
+				printf("||%23s||%26d Мин||%19f М||%11d||%21d Км/ч||\n", gon[i].name, gon[i].time, gon[i].distance, gon[i].complexity, gon[i].avg_speed);
 				printf("---------------------------------------------------------------------------------------------------------------------------\n");
 			}
 
 		}
-		gon++;
+
 
 	return *gon;
 }
@@ -230,30 +225,23 @@ int write(char* namefile, GONKA* gon, int count)
 	}
 	return 0;
 }
-GONKA read(char* namefile,GONKA* gon)
+int read(char* namefile,GONKA* gon)
 {
 	FILE* open;
-	char buffer[50];
-	int n = 0;
 	int z;
-	open = fopen(namefile, "r");
-	while (!feof(open)) {
-		fgets(buffer, 100, open);
-		n++;
-	}
-	n /= 6 ;
-	gon = (GONKA*)malloc(n * sizeof(gon));
-	fseek(open, 0, SEEK_SET);
-	for (int i = 0; i < n; i++) {
-		fscanf(open, "%d\n", &z);
-		fgets(&gon[i].name, 10, open);
-		fscanf(open, "%f\n", &gon[i].distance);
-		fscanf(open, "%d\n", &gon[i].time);
-		fscanf(open, "%d\n", &gon[i].complexity);
-		fscanf(open, "%d\n", &gon[i].avg_speed);
-
+	int  i = 0;
+	open = fopen(namefile, "rb");
+	while (!feof(open))
+	{
+		fscanf(open, "\r\n%d\r\n", &z);
+		fscanf(open, "%s\r\n", gon[i].name);
+		fscanf(open, "%f\r\n", &gon[i].distance);
+		fscanf(open, "%d\r\n", &gon[i].time);
+		fscanf(open, "%d\r\n", &gon[i].complexity);
+		fscanf(open, "%d\r\n", &gon[i].avg_speed);
+		i+=1;
 	}
 	fclose(open);
 	printf("Файл успешно прочитан!\n");
-	return *gon;
+	return i;
 }
