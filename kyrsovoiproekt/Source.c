@@ -16,20 +16,20 @@ struct gonka {
 };
 typedef struct gonka GONKA;
 
-GONKA add(GONKA *gon, int count);
-void vivod(GONKA *gon, int count);
-GONKA searchdist(GONKA* gon, int count);
-GONKA searchname(GONKA* gon, int count);
-GONKA sort(GONKA* gon, int count);
-int write(char* namefile, GONKA* gon, int count);
+GONKA *add(GONKA *gon, int *count);
+void vivod(GONKA *gon, int *count);
+int searchdist(GONKA* gon, int *count);
+int searchname(GONKA* gon, int *count);
+GONKA *sort(GONKA* gon, int *count);
+int write(char* namefile, GONKA* gon, int *count);
 int read(char* namefile, GONKA* gon);
 int main()
 {
 	system("chcp 1251");
 	system("cls");
 	GONKA* gon;
-	gon = (GONKA*)malloc(N * sizeof(GONKA));
-	int kol, flag1 = 1, choice1, choice2, compl;
+	int kol=0, flag1 = 1, choice1, choice2, compl, nom;
+	gon = (GONKA*)malloc(kol * sizeof(GONKA));
 	char namefile[100];
 	printf("***************************************\n");
 	printf("*             База данных             *\n");
@@ -41,7 +41,7 @@ int main()
 	while (flag1)
 	{
 		system("cls");
-		printf("Выберите функцию\n1.Ввод значений.\n2.Вывод значений\n3.Поиск структуры по названию соревнований\n4.Поиск структуры по длинне трассы\n5.Сортировка данных\n6.Запись данных в файл\n7.Чтение данных из файла\n0.Выход из программы\n");
+		printf("Выберите функцию\n1.Ввод значений.\n2.Вывод значений\n3.Поиск структуры по названию соревнований\n4.Поиск структуры по длинне трассы (больше N)\n5.Сортировка данных\n6.Запись данных в файл\n7.Чтение данных из файла\n0.Выход из программы\n");
 		scanf("%d", &choice1);
 		system("cls");
 		switch (choice1)
@@ -50,38 +50,46 @@ int main()
 			system("cls");
 			printf("Введите кол-во записей\n");
 			scanf("%d", &kol);
-			gon = (GONKA*)malloc(kol * sizeof(GONKA));
-			add(gon, kol);
+			gon = (GONKA*)realloc(gon,kol * sizeof(GONKA));
+			add(gon, &kol);
 			break;
 
 
 		case 2:
 
-			vivod(gon, kol);
+			vivod(gon, &kol);
 			system("pause");
 			break;
 
 
 		case 3:
-			searchname(gon, kol);
+			nom=searchname(gon, &kol);
+			printf("---------------------------------------------------------------------------------------------------------------------------\n");
+			printf("|| Название соревнований || Продолжительность гонки(мин) || Длина трассы(метры) || Сложность || Средняя скорость(км / ч) || \n");
+			printf("---------------------------------------------------------------------------------------------------------------------------\n");
+			printf("||%23s||%26d Мин||%19f М||%11d||%21d Км/ч||\n", gon[nom].name, gon[nom].time, gon[nom].distance, gon[nom].complexity, gon[nom].avg_speed);
+			printf("---------------------------------------------------------------------------------------------------------------------------\n");
 			system("pause");
 			break;
 		case 4:
-			searchdist(gon, kol);
+			searchdist(gon, &kol);
 			system("pause");
 			break;
 		case 5:
-			sort(gon, kol);
+			sort(gon, &kol);
+			vivod(gon, &kol);
+			system("pause");
 			break;
 		case 6:
 			printf("Введите название файла\n");
 			scanf("%s", &namefile);
-			write(namefile, gon, kol);
+			write(namefile, gon, &kol);
 			break;
 		case 7:
 			printf("Введите название файла\n");
 			scanf("%s", &namefile);
 			kol=read(namefile, gon);
+			gon = (GONKA*)realloc(gon, kol * sizeof(GONKA));
 			system("pause");
 			break;
 
@@ -100,9 +108,9 @@ int main()
 	system("pause");
 }
 
-GONKA add(GONKA* gon, int count)
+GONKA *add(GONKA* gon, int *count)
 {
-	for (int z = 0; z < count; z++)
+	for (int z = 0; z < *count; z++)
 	{
 		printf("Введите название соревнований = ");
 		scanf("%s", &gon[z].name);
@@ -116,44 +124,40 @@ GONKA add(GONKA* gon, int count)
 		scanf("%d", &gon[z].avg_speed);
 		printf("\n");
 	}
-	return *gon;
+	return gon;
 }
-void vivod(GONKA* gon, int count)
+void vivod(GONKA* gon, int *count)
 {
 	printf("--------------------------------------------------------------------------------------------------------------------------------------------\n");
 	printf("|| Номер  || Название соревнований  ||  Продолжительность гонки(мин)  ||  Длина трассы(метры)  ||  Сложность  ||  Средняя скорость(км/ч)  ||\n");
 	printf("--------------------------------------------------------------------------------------------------------------------------------------------\n");
-	for (int q = 0; q <count; q++)
+	for (int q = 0; q <*count; q++)
 	{
 		printf("||%8d||%24s||%28d Мин||%21f М||%13d||%21d Км/ч||\n", q + 1, gon[q].name, gon[q].time, gon[q].distance,gon[q].complexity, gon[q].avg_speed);
 		printf("--------------------------------------------------------------------------------------------------------------------------------------------\n");
 	}
 
 }
-GONKA searchname(GONKA* gon, int count)
+int searchname(GONKA* gon, int *count)
 {
 	char kr[10];
 	printf("Введите название соревнований\n");
 	scanf("%s", kr);
-	printf("---------------------------------------------------------------------------------------------------------------------------\n");
-	printf("|| Название соревнований || Продолжительность гонки(мин) || Длина трассы(метры) || Сложность || Средняя скорость(км / ч) || \n");
-	printf("---------------------------------------------------------------------------------------------------------------------------\n");
-	for (int i = 0; i < count; i++)
+	for (int i = 0; i < *count; i++)
 	{
 		if (strcmp(gon[i].name, kr) == 0)
 		{
-			printf("||%23s||%26d Мин||%19f М||%11d||%21d Км/ч||\n", gon[i].name, gon[i].time, gon[i].distance, gon[i].complexity, gon[i].avg_speed);
-			printf("---------------------------------------------------------------------------------------------------------------------------\n");
+			return i;
 		}
+		
 
 
 	}
 
 
 
-	return *gon;
 }
-GONKA searchdist(GONKA* gon, int count)
+int searchdist(GONKA* gon, int *count)
 {
 	int kr;
 	printf("Введите длину трассы\n");
@@ -161,7 +165,7 @@ GONKA searchdist(GONKA* gon, int count)
 	printf("---------------------------------------------------------------------------------------------------------------------------\n");
 	printf("|| Название соревнований || Продолжительность гонки(мин) || Длина трассы(метры) || Сложность || Средняя скорость(км / ч) || \n");
 	printf("---------------------------------------------------------------------------------------------------------------------------\n");
-		for (int i = 0; i < count; i++)
+		for (int i = 0; i < *count; i++)
 		{
 			if (gon[i].distance >= kr)
 			{
@@ -172,13 +176,12 @@ GONKA searchdist(GONKA* gon, int count)
 		}
 
 
-	return *gon;
 }
-GONKA sort(GONKA* gon, int count)
+GONKA *sort(GONKA* gon, int *count)
 {
 	system("cls");
 	GONKA sort;
-	for (int q = count - 1; q >= 0; q--)
+	for (int q = *count - 1; q >= 0; q--)
 	{
 		for (int p = 0; p < q; p++)
 		{
@@ -193,9 +196,9 @@ GONKA sort(GONKA* gon, int count)
 	printf("Сортировка по Средней скорости * сложность в порядке убывания завершена\n");
 	system("pause");
 	system("cls");
-	return *gon;
+	return gon;
 }
-int write(char* namefile, GONKA* gon, int count)
+int write(char* namefile, GONKA* gon, int *count)
 {
 	FILE* data;
 	int i;
@@ -208,7 +211,7 @@ int write(char* namefile, GONKA* gon, int count)
 	}
 	else
 	{
-		for (i = 0; i < count; i++)
+		for (i = 0; i < *count; i++)
 		{
 			fprintf(data, "%d\n", i + 1);
 			fprintf(data, "%s\n", gon[i].name);
@@ -223,7 +226,6 @@ int write(char* namefile, GONKA* gon, int count)
 		printf("Данные записаны\n");
 		system("pause");
 	}
-	return 0;
 }
 int read(char* namefile,GONKA* gon)
 {
